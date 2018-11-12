@@ -225,14 +225,20 @@ class Blockchain{
             handler: async (request, h) => {
               //check if there is any input data for block and add block only if there is
               if (request.payload.address && request.payload.star.ra && request.payload.star.dec && request.payload.star.story){
+                //set blockindex variable
+                let blockIndex;
                 //check if the address has been validated
                 for (let i=0; i<validatedList.length; i++) {if (validatedList[i].status.address===request.payload.address){
+                  //get the position of the address on the list
+                  blockIndex = i;
                   //create new block
                   await this.addBlock(new Block(request.payload.address, request.payload.star.ra, request.payload.star.dec, request.payload.star.story, request.payload.star.mag,request.payload.star.con));
                   //get block height first
                   let unadjheight = await this.getBlockHeight();
                   //adjust the height
-                  let index = unadjheight - 1
+                  let index = unadjheight - 1;
+                  //remove the address from the Validated list
+                  validatedList.splice(blockIndex,1);
                   //return the latest block info
                   return JSON.parse(await this.getBlock(index));
                  }else {
